@@ -55,7 +55,7 @@ fraud_scoring_platform/
 ├── requirements.txt                             # Dépendances Python
 └── README.md
 ```
-
+---
 ## 🔄 Pipeline global
 
 ```mermaid
@@ -103,3 +103,26 @@ flowchart TD
 
 
 ```
+---
+## ⚙️ Stack Technique
+- **Orchestration** : Apache Airflow
+- **Traitement batch** : PySpark
+- **Traitement temps réel** : Spark Structured Streaming + Kafka
+- **Stockage analytique** : Snowflake / BigQuery
+- **Qualité des données** : Great Expectations
+- **Monitoring** : Airflow + Logs + Metrics
+
+## 🚀 Exécution
+
+```bash
+# Lancer Airflow
+docker-compose up airflow-webserver airflow-scheduler
+
+# Déclencher le DAG batch manuellement
+airflow dags trigger dag_batch_customers_transactions
+
+# Visualiser le rapport de qualité
+open reports/data_quality_report.html
+
+```
+
