@@ -1,4 +1,6 @@
-# 🚀 plateforme-de-scoring-fraude-chargement-vers-Snowflake: Pipelines fiables pour l’ingestion et la transformation des données
+# 🚀 plateforme-de-scoring-fraude-chargement-vers-Snowflake: 
+
+Pipelines fiables pour l’ingestion et la transformation des données
 
 ## 🎯 Objectif
 Mettre en place des pipelines **batch**, **streaming**, et de **qualité de données** afin d’assurer la fiabilité, la cohérence et la fraîcheur des données pour les analyses.
