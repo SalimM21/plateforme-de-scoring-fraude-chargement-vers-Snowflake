@@ -67,31 +67,31 @@ flowchart TD
     %% =====================================
 
     %% Niveau 1 : ETL
-    subgraph ETL["🏗️ ETL & Data Pipeline"]
-        A["📥 Extraction CRM et Transactions J-1"]
-        B["🧹 Transformation PySpark"]
-        C["🏦 Chargement dans Snowflake ou BigQuery"]
+    subgraph ETL[" ETL & Data Pipeline"]
+        A[" Extraction CRM et Transactions J-1"]
+        B[" Transformation PySpark"]
+        C[" Chargement dans Snowflake ou BigQuery"]
     end
 
     %% Niveau 2 : Streaming & Features
-    subgraph STREAM["⚡ Pipeline Streaming & Feature Engineering"]
-        D["📊 Pipeline Kafka Streaming"]
-        E["🧠 Feature Engineering (moyennes glissantes, anomalies)"]
-        F["🏁 Sink vers Snowflake ou BigQuery"]
+    subgraph STREAM[" Pipeline Streaming & Feature Engineering"]
+        D[" Pipeline Kafka Streaming"]
+        E[" Feature Engineering (moyennes glissantes, anomalies)"]
+        F[" Sink vers Snowflake ou BigQuery"]
     end
 
     %% Niveau 3 : Qualité & Monitoring
-    subgraph QUALITY["✅ Contrôle Qualité & Monitoring"]
-        G["🧾 Great Expectations : validation des données"]
-        H["📈 Rapport qualité hebdomadaire"]
-        I["📧 Notification Slack/Email"]
+    subgraph QUALITY[" Contrôle Qualité & Monitoring"]
+        G[" Great Expectations : validation des données"]
+        H[" Rapport qualité hebdomadaire"]
+        I[" Notification Slack/Email"]
     end
 
     %% Niveau 4 : Ops / CI-CD
-    subgraph OPS["☸️ Orchestration & CI/CD"]
-        J["🪶 Airflow DAGs : orchestration ETL/Streaming"]
-        K["⚙️ GitHub Actions : tests et déploiement automatique"]
-        L["📊 Monitoring : logs, alertes, dashboards"]
+    subgraph OPS[" Orchestration & CI/CD"]
+        J[" Airflow DAGs : orchestration ETL/Streaming"]
+        K[" GitHub Actions : tests et déploiement automatique"]
+        L[" Monitoring : logs, alertes, dashboards"]
     end
 
     %% 🔗 Flux hiérarchique vertical
