@@ -1,4 +1,4 @@
-# 🚀 plateforme-de-scoring-fraude-chargement-vers-Snowflake: 
+# 🗄️ plateforme de scoring fraude chargement vers Snowflake: 
 
 Pipelines fiables pour l’ingestion et la transformation des données
 
