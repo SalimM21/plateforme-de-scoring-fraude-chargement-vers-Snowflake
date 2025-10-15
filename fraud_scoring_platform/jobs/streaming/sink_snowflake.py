@@ -1,0 +1,1 @@
+# Écriture vers Snowflake / BigQuery
