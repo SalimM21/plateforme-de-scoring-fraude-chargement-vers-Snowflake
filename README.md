@@ -127,4 +127,3 @@ airflow dags trigger dag_batch_customers_transactions
 open reports/data_quality_report.html
 
 ```
-
