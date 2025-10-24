@@ -1,4 +1,4 @@
-# 🚀 plateforme-de-scoring-fraude-chargement-vers-Snowflake: 
+# 🗄️ plateforme de scoring fraude chargement vers Snowflake: 
 
 Pipelines fiables pour l’ingestion et la transformation des données
 
@@ -127,4 +127,3 @@ airflow dags trigger dag_batch_customers_transactions
 open reports/data_quality_report.html
 
 ```
-
