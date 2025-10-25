@@ -1,1 +1,74 @@
 # Connexions Snowflake/BigQuery
+# ============================================================
+# warehouse_config.yaml
+# ------------------------------------------------------------
+# Configuration des connexions aux entrepôts de données :
+# - Snowflake
+# - BigQuery
+# ------------------------------------------------------------
+# Ce fichier est utilisé par les scripts :
+#   - load_warehouse.py
+#   - sink_snowflake.py
+#   - DAGs Airflow (batch, streaming)
+# ============================================================
+
+warehouse:
+  default_target: "snowflake"   # options: [snowflake, bigquery]
+
+# ============================================================
+# ❄️ Snowflake Configuration
+# ============================================================
+snowflake:
+  account: "entreprise.eu-central-1"
+  warehouse: "DATA_PIPELINE_WH"
+  database: "ANALYTICS"
+  schema: "PUBLIC"
+  role: "DATA_ENGINEER"
+  user: "snowflake_user"
+  password: "********"
+  sfURL: "entreprise.eu-central-1.snowflakecomputing.com"
+  stage: "@RAW_STAGE"
+  temp_stage: "@TEMP_STAGE"
+  file_format: "TYPE = PARQUET"
+  parallel: 8
+  autocommit: true
+  enable_warehouse_monitoring: true
+  keep_alive: true
+
+# ============================================================
+# 🧠 BigQuery Configuration
+# ============================================================
+bigquery:
+  project_id: "data-warehouse-prod"
+  dataset: "analytics"
+  location: "EU"
+  table_prefix: "prod_"
+  credentials_path: "/opt/airflow/keys/gcp_key.json"
+  temp_gcs_bucket: "bq-temp-staging"
+  write_disposition: "WRITE_APPEND"
+  create_disposition: "CREATE_IF_NEEDED"
+  max_bad_records: 5
+  enable_table_expiration: false
+  clustering_fields: ["customer_id", "transaction_date"]
+  partitioning_field: "transaction_date"
+
+# ============================================================
+# 🧩 Monitoring & Logging
+# ============================================================
+monitoring:
+  enable_audit_logs: true
+  log_table: "LOAD_AUDIT_LOGS"
+  retention_days: 30
+  alert_on_failure: true
+  alert_channel: "#data-pipeline-alerts"
+
+# ============================================================
+# 🔒 Sécurité & Chiffrement
+# ============================================================
+security:
+  encryption: "AES256"
+  key_management: "gcp_kms"
+  mask_sensitive_data: true
+  roles_authorized:
+    - "DATA_ENGINEER"
+    - "DATA_ANALYST"
