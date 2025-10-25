@@ -1,1 +1,111 @@
 # Configuration Spark (batch et streaming)
+# ============================================================
+# spark_config.yaml
+# ------------------------------------------------------------
+# Configuration Spark centralisée pour les jobs batch et streaming :
+# - Paramètres cluster et ressources
+# - Configurations spécifiques Snowflake / BigQuery
+# - Paramètres Kafka et gestion des checkpoints
+# ============================================================
+
+spark:
+  env: "production"
+  master: "spark://spark-master:7077"
+  app_name: "DataPipelineApp"
+  executor_memory: "4g"
+  driver_memory: "2g"
+  executor_cores: 2
+  dynamic_allocation: true
+  shuffle_partitions: 200
+  log_level: "INFO"
+
+# ============================================================
+# ⚙️ Configurations Batch
+# ============================================================
+batch:
+  input_sources:
+    crm:
+      type: "jdbc"
+      format: "postgres"
+      url: "jdbc:postgresql://crm-db.internal:5432/crm"
+      table: "customers"
+      user: "spark_user"
+      password: "********"
+      fetch_size: 10000
+    transactions:
+      type: "jdbc"
+      format: "mysql"
+      url: "jdbc:mysql://trans-db.internal:3306/transactions"
+      table: "transactions_j1"
+      user: "spark_user"
+      password: "********"
+      fetch_size: 10000
+
+  transformations:
+    enable_null_cleaning: true
+    enable_duplicate_removal: true
+    enable_type_casting: true
+    enable_enrichment: true
+
+  output:
+    warehouse: "snowflake"   # options: [snowflake, bigquery]
+    save_mode: "overwrite"
+    partition_column: "transaction_date"
+
+# ============================================================
+# ⚡ Configurations Streaming
+# ============================================================
+streaming:
+  kafka:
+    bootstrap_servers: "kafka01.internal:9092,kafka02.internal:9092"
+    topic: "transactions_stream"
+    starting_offsets: "latest"
+    max_offsets_per_trigger: 1000
+    fail_on_data_loss: false
+
+  checkpoint_location: "/data/checkpoints/transactions"
+  trigger_interval: "5 seconds"
+  watermark_delay: "1 minute"
+
+  feature_engineering:
+    moving_average_window: 5
+    anomaly_threshold: 2.5
+
+  output:
+    sink: "bigquery"        # options: [snowflake, bigquery]
+    write_mode: "append"
+    batch_size: 500
+    table: "real_time_transactions"
+
+# ============================================================
+# ❄️ Config Snowflake
+# ============================================================
+snowflake:
+  account: "entreprise.eu-central-1"
+  warehouse: "DATA_PIPELINE_WH"
+  database: "ANALYTICS"
+  schema: "PUBLIC"
+  role: "DATA_ENGINEER"
+  user: "snowflake_user"
+  password: "********"
+  sfURL: "entreprise.eu-central-1.snowflakecomputing.com"
+
+# ============================================================
+# 🧠 Config BigQuery
+# ============================================================
+bigquery:
+  project_id: "data-warehouse-prod"
+  dataset: "analytics"
+  temp_gcs_bucket: "bq-temp-staging"
+  credentials_path: "/opt/spark/keys/gcp_key.json"
+
+# ============================================================
+# 🧩 Logging & Monitoring
+# ============================================================
+monitoring:
+  enable_metrics: true
+  metrics_sink: "prometheus"
+  metrics_port: 4040
+  enable_event_log: true
+  event_log_dir: "/opt/spark/events"
+  enable_history_server: true
