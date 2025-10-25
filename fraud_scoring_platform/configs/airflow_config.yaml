@@ -1,1 +1,102 @@
 # Configuration Airflow (connexions, scheduling)
+# ============================================================
+# airflow_config.yaml
+# ------------------------------------------------------------
+# Configuration centralisée d’Airflow :
+# - Connexions (sources, cibles, outils)
+# - Variables globales (paramètres Spark, Snowflake, etc.)
+# - Scheduling des DAGs
+# ============================================================
+
+airflow:
+  env: "production"
+  default_owner: "data_engineering_team"
+  retries: 2
+  retry_delay_minutes: 5
+  email_on_failure: true
+  email_recipients:
+    - "dataops@entreprise.com"
+    - "analyste@entreprise.com"
+
+# ============================================================
+# 🔗 Connexions Airflow
+# ============================================================
+connections:
+  - id: "crm_db"
+    type: "postgres"
+    host: "crm-db.internal"
+    schema: "crm"
+    login: "airflow_user"
+    password: "********"
+    port: 5432
+
+  - id: "transactions_db"
+    type: "mysql"
+    host: "trans-db.internal"
+    schema: "transactions"
+    login: "airflow_user"
+    password: "********"
+    port: 3306
+
+  - id: "kafka_cluster"
+    type: "kafka"
+    bootstrap_servers: "kafka01.internal:9092,kafka02.internal:9092"
+    topic: "transactions_stream"
+
+  - id: "snowflake_dw"
+    type: "snowflake"
+    account: "entreprise.eu-central-1"
+    warehouse: "DATA_PIPELINE_WH"
+    database: "ANALYTICS"
+    schema: "PUBLIC"
+    login: "snowflake_user"
+    password: "********"
+
+  - id: "bigquery_dw"
+    type: "google_cloud_platform"
+    project: "data-warehouse-prod"
+    keyfile_path: "/opt/airflow/keys/gcp_key.json"
+
+  - id: "slack_notification"
+    type: "http"
+    endpoint: "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+
+# ============================================================
+# ⚙️ Variables Airflow
+# ============================================================
+variables:
+  spark_master: "spark://spark-master:7077"
+  spark_app_name: "DataPipelineApp"
+  batch_data_path: "/data/batch"
+  streaming_checkpoint_path: "/data/checkpoints"
+  ge_root_dir: "/opt/airflow/dags/great_expectations"
+  reports_dir: "/opt/airflow/dags/reports/data_quality"
+  kafka_topic_transactions: "transactions_stream"
+  slack_channel: "#data-alerts"
+  snowflake_stage: "@RAW_STAGE"
+
+# ============================================================
+# ⏰ Scheduling des DAGs
+# ============================================================
+scheduling:
+  dag_batch_customers_transactions:
+    description: "Pipeline batch quotidien pour CRM + transactions"
+    schedule_interval: "0 2 * * *"     # Tous les jours à 02:00
+    start_date: "2025-01-01"
+    catchup: false
+
+  dag_streaming_transactions:
+    description: "Pipeline streaming temps réel (transactions)"
+    schedule_interval: "@once"         # Démarrage manuel / continu
+    catchup: false
+
+  dag_data_quality:
+    description: "Vérification de la qualité des données"
+    schedule_interval: "0 8 * * 1"     # Chaque lundi à 08:00
+    start_date: "2025-01-01"
+    catchup: false
+
+  dag_notify_quality:
+    description: "Notification automatique du rapport qualité"
+    schedule_interval: "0 9 * * 1"     # Chaque lundi à 09:00
+    catchup: false
