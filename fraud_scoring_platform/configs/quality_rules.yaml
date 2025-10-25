@@ -1,1 +1,92 @@
 # Règles de validation de la qualité des données
+# quality_rules.yaml
+# ---------------------------------------------------------------------
+# Règles de validation de la qualité des données pour les jeux CRM et transactions.
+# Ces règles sont utilisées par Great Expectations dans le DAG Airflow "dag_data_quality.py".
+# ---------------------------------------------------------------------
+
+datasets:
+  customers:
+    description: "Données clients issues du CRM"
+    expectations:
+      - name: "no_null_customer_id"
+        type: "expect_column_values_to_not_be_null"
+        column: "customer_id"
+        severity: "critical"
+        message: "Le champ customer_id ne doit pas contenir de valeurs nulles."
+
+      - name: "unique_customer_id"
+        type: "expect_column_values_to_be_unique"
+        column: "customer_id"
+        severity: "critical"
+        message: "Les identifiants clients doivent être uniques."
+
+      - name: "valid_email_format"
+        type: "expect_column_values_to_match_regex"
+        column: "email"
+        regex: "^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$"
+        severity: "warning"
+        message: "Certaines adresses email ne respectent pas le format valide."
+
+      - name: "valid_age_range"
+        type: "expect_column_values_to_be_between"
+        column: "age"
+        min_value: 18
+        max_value: 99
+        severity: "warning"
+        message: "Âge du client en dehors de la plage autorisée (18-99)."
+
+  transactions:
+    description: "Flux de transactions quotidiennes"
+    expectations:
+      - name: "no_null_transaction_id"
+        type: "expect_column_values_to_not_be_null"
+        column: "transaction_id"
+        severity: "critical"
+        message: "Le champ transaction_id ne doit pas contenir de valeurs nulles."
+
+      - name: "positive_amount"
+        type: "expect_column_values_to_be_between"
+        column: "amount"
+        min_value: 0
+        max_value: 100000
+        severity: "critical"
+        message: "Montant de transaction invalide (négatif ou supérieur à 100000)."
+
+      - name: "valid_currency"
+        type: "expect_column_values_to_be_in_set"
+        column: "currency"
+        values: ["USD", "EUR", "MAD"]
+        severity: "warning"
+        message: "Certaines devises ne sont pas reconnues."
+
+      - name: "timestamp_not_future"
+        type: "expect_column_values_to_be_less_than"
+        column: "timestamp"
+        value: "now"
+        severity: "warning"
+        message: "Certaines transactions datent du futur (erreur horodatage)."
+
+  joins:
+    description: "Vérifications d'intégrité entre CRM et transactions"
+    expectations:
+      - name: "foreign_key_customer_exists"
+        type: "expect_column_values_to_exist_in_other_table"
+        column: "customer_id"
+        reference_table: "customers"
+        reference_column: "customer_id"
+        severity: "critical"
+        message: "Des transactions contiennent un customer_id inexistant dans la base CRM."
+
+# ---------------------------------------------------------------------
+# Paramètres généraux
+# ---------------------------------------------------------------------
+notification:
+  enable_slack: true
+  enable_email: false
+  slack_channel: "#data-quality-alerts"
+
+reporting:
+  generate_weekly_report: true
+  save_path: "reports/weekly_quality_report.html"
+  save_to_warehouse: true
