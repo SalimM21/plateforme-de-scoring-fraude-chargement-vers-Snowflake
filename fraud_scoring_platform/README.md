@@ -137,12 +137,12 @@ ENV PYTHONPATH=/opt/airflow
 ```mermaid
 graph TD
   A[Kafka Transactions] --> B[Spark Structured Streaming]
-  B --> C[Feature Engineering (moyenne glissante, anomalies)]
-  C --> D[Sink Snowflake/BigQuery]
+  B --> C["Feature Engineering: moyenne glissante, anomalies"]
+  C --> D["Sink Snowflake/BigQuery"]
   E[CRM Extract Batch] --> F[PySpark Transform]
   F --> D
-  D --> G[Great Expectations Validation]
-  G --> H[Quality Report + Slack Notify]
+  D --> G["Great Expectations Validation"]
+  G --> H["Quality Report + Slack Notify"]
 ```
 
 ---
